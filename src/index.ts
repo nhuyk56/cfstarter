@@ -18,7 +18,7 @@ export interface Env {
 	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
 	// MY_BUCKET: R2Bucket;
 }
-import { getSpeechAuth, generateChunk, moveToTransfer, generateSpeech } from './helpers'
+import { routers } from './routers'
 
 export default {
 	async fetch(
@@ -26,18 +26,35 @@ export default {
 		env: Env,
 		ctx: ExecutionContext
 	) {
-		const speechAuth = await getSpeechAuth()		
+		const { pathname } = new URL(request.url);
+		const router = routers.find(r => new RegExp(`^${r.route}$`).test(pathname))
+		if (router) {
+			const res = await router?.handle()
+			if (res) {
+				if (typeof res !== 'string') {
+					return new Response(JSON.stringify(res))
+				} else return new Response(res)
+			}
+		}
+		return new Response('404', { status: 404 })
+		// [
+		// 	{
+		// 		route: '',
+		// 		handle: () => {}
+		// 	}
+		// ]
+		// const speechAuth = await getSpeechAuth()		
 
-		const chunks = await generateChunk('https://raw.githubusercontent.com/nhuyk56/SyncStorage1/2e267fac53a5eedae923235dfdd7408a/8a90f70d52dc5231ca9dd3a418fc5070')
-		const filesTransfer =  await Promise.all(chunks.map((c:string) => moveToTransfer(c)))
-		// return new Response(JSON.stringify(filesTransfer))
+		// const chunks = await generateChunk('https://raw.githubusercontent.com/nhuyk56/SyncStorage1/2e267fac53a5eedae923235dfdd7408a/8a90f70d52dc5231ca9dd3a418fc5070')
+		// const filesTransfer =  await Promise.all(chunks.map((c:string) => moveToTransfer(c)))
+		// // return new Response(JSON.stringify(filesTransfer))
 
-		const dataSpeech =  await generateSpeech({
-			fileText: filesTransfer[0],
-			// contentText: chunks[0],
-			headers: speechAuth
-		})
+		// const dataSpeech =  await generateSpeech({
+		// 	fileText: filesTransfer[0],
+		// 	// contentText: chunks[0],
+		// 	headers: speechAuth
+		// })
 
-		return new Response(JSON.stringify(dataSpeech))
+		// return new Response(JSON.stringify(dataSpeech))
 	},
 };
