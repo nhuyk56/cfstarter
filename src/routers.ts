@@ -2,7 +2,7 @@ import {
   controllerAuth,
   controllerChunks,
   controllerAudio
-} from './controller.ts'
+} from './controller'
 
 const routers = [
   { route: '/auth', handle: controllerAuth },
