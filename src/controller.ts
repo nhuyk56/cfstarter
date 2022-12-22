@@ -35,7 +35,8 @@ const controllerChunks = async (r: Request) => {
     const chunks = await generateChunk(textURL)
     const chunkGeneral = chunks.join(CHUNK_SEPARATION)
     const fileChunkGeneral = await moveToTransfer(chunkGeneral)
-    return fileChunkGeneral
+    // @todo hide fileChunkGeneral
+    return { count: chunks.length, id: fileChunkGeneral }
   } catch (error: any) {
     handleError({ error, input: JSON.stringify(input) }, 'CONTROLLER-CHUNKS')
   }
