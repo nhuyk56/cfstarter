@@ -6,10 +6,7 @@ import {
   generateSpeech
 } from './helpers'
 
-const controllerAuth = async (r:Request) => {
-  const input = await parseRequest(r)
-  return input
-}
+const controllerAuth = async (r:Request) => getSpeechAuth().then(({ authorization }) => authorization.replace('MS-SessionToken', '').trim())
 const controllerChunks = async (r:Request) => {
   const input = await parseRequest(r)
   return input
