@@ -127,8 +127,10 @@ const generateSpeech = async (params: any) => {
   const api = 'https://learningtools.onenote.com/learningtoolsapi/v2.0/GetSpeech'
   if (params?.fileText) {
     const dataRawFetch = await get(params?.fileText)
-    console.log(dataRawFetch)
-    if (!dataRawFetch.ok) throw new Error(dataRawFetch.data)
+    if (!dataRawFetch.ok) {
+      console.log(dataRawFetch)
+      throw new Error(dataRawFetch.data)
+    }
     params.contentText = dataRawFetch.data
   }
   const body = {
@@ -152,6 +154,7 @@ const generateSpeech = async (params: any) => {
     }
   }
   const { data } = await post(api, { headers: params?.headers, body })
+  return data?.data?.sb.map((it:any) => it?.ad?.replace('data:audio/mpeg;base64,', '')).join('\n')
 }
 
 const handleError  = (error:any, name:any) => {
