@@ -156,11 +156,18 @@ const generateSpeech = async (params: any) => {
   return data?.data?.sb.map((it: any) => it?.ad?.replace('data:audio/mpeg;base64,', '')).join('\n')
 }
 
+const handleError  = (error:any, name:any) => {
+  console.log(`========================[${name}]========================`)
+  console.log(error, 'controllerChunks')
+  console.log(`========================[${name}]========================`)
+}
+
 export {
   getSpeechAuth,
   generateChunk,
   moveToTransfer,
   generateSpeech,
   readRequestBody,
-  parseRequest
+  parseRequest,
+  handleError
 }

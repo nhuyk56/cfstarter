@@ -8,10 +8,18 @@ import {
   getSpeechAuth,
   generateChunk,
   moveToTransfer,
-  generateSpeech
+  generateSpeech,
+  handleError
 } from './helpers'
 
-const controllerAuth = async (r: Request) => getSpeechAuth().then(({ authorization }) => authorization.replace('MS-SessionToken', '').trim())
+const controllerAuth = async (r: Request) => {
+  try {
+    return await getSpeechAuth().then(({ authorization }) => authorization.replace('MS-SessionToken', '').trim())
+  } catch (error: any) {
+    handleError(error, 'CONTROLLER-AUTH')
+  }
+  return null  
+}
 const controllerChunks = async (r: Request) => {
   try {
     // nhuyk56-SyncStorage1-2e267fac53a5eedae923235dfdd7408a-8a90f70d52dc5231ca9dd3a418fc5070
@@ -23,7 +31,7 @@ const controllerChunks = async (r: Request) => {
     const chunks = await generateChunk(textURL).then(chunks => Promise.all(chunks.map((c: string) => moveToTransfer(c))))
     return { chunks }
   } catch (error: any) {
-    console.log(error?.message || error, 'controllerChunks')
+    handleError(error, 'CONTROLLER-CHUNKS')
   }
   return null
 }
@@ -36,9 +44,9 @@ const controllerAudio = async (r: Request) => {
     const [hostFile, ID1, ID2] = pathname.split('/').pop()?.split('-') || []
     const fileText = `https://${hostFile}/${ID1}/${ID2}`
     const headers = await getSpeechAuth()
-    return generateSpeech({ fileText, headers })
+    return await generateSpeech({ fileText, headers })
   } catch (error: any) {
-    console.log(error?.message || error, 'controllerChunks')
+    handleError(error, 'CONTROLLER-AUDIO')
   }
   return null
 }
