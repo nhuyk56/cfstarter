@@ -119,8 +119,18 @@ const generateChunk = async (url: string) => {
 }
 
 const moveToTransfer = async (contentText: string) => {
-  const { data } = await tryMethod(() => put('https://transfer.sh/hello.txt', { body: contentText }))
-  return data
+  let times = 10
+  while (times > 0) {
+    try {
+      const {ok, data} = await tryMethod(() => put('https://transfer.sh/hello.txt', { body: contentText }))
+      if (ok) {
+        return data
+      }
+    } catch (error: any) {
+      console.log(error?.message, '[try times]', --times)
+    }
+  }
+  throw new Error('Transfer error')
 }
 
 const generateSpeech = async (params: any) => {
