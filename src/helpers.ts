@@ -98,7 +98,8 @@ const getSpeechAuth = async () => {
 }
 
 const generateChunk = async (url: string) => {
-  const { data } = await tryMethod(() => get(url));
+  const { data, ok } = await tryMethod(() => get(url));
+  if(!ok) throw new Error(data)
   const chunks = []
   let chunk = ''
   data.split(/\.|\n/).forEach((v: string) => {
@@ -128,7 +129,7 @@ const generateSpeech = async (params: any) => {
   if (params?.fileText) {
     const dataRawFetch = await get(params?.fileText)
     console.log(dataRawFetch)
-    if(!dataRawFetch.ok) return 'HELLO'
+    if (!dataRawFetch.ok) throw new Error(dataRawFetch.data)
     params.contentText = dataRawFetch.data
   }
   const body = {
