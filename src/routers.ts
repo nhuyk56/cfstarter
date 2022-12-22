@@ -6,7 +6,7 @@ import {
 
 const routers = [
   { route: '/auth', method: 'GET' , handle: controllerAuth },
-  { route: '/chunks', method: 'POST' , handle: controllerChunks },
+  { route: '/chunks/[^/]+', method: 'GET' , handle: controllerChunks },
   { route: '/audio', method: 'POST' , handle: controllerAudio }
 ]
 
