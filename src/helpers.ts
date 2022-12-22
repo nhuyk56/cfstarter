@@ -158,7 +158,7 @@ const generateSpeech = async (params: any) => {
 
 const handleError  = (error:any, name:any) => {
   console.log(`========================[${name}]========================`)
-  console.log(error, 'controllerChunks')
+  console.warn(error)
   console.log(`========================[${name}]========================`)
 }
 
