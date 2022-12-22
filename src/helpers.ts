@@ -103,8 +103,8 @@ const generateChunk = async (url: string) => {
   let chunk = ''
   data.split(/\.|\n/).forEach((v: string) => {
     if (v && v.trim()) {
-      if (`${chunk} ${v.trim()}`.length <= 1500) {
-        chunk = `${chunk} ${v.trim()}`
+      if (`${chunk}. ${v.trim()}`.length <= 1500) {
+        chunk = `${chunk}. ${v.trim()}`
       } else {
         chunks.push(chunk)
         chunk = v.trim()
