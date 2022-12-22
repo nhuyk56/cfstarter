@@ -1,3 +1,4 @@
+const CHUNK_SEPARATION = '\n_______________________________________________________________________________________________________\n'
 async function parseRequest(request:Request) {
   const { method, url, headers, redirect, fetcher, signal, cf } = request
   const body:any = await readRequestBody(request)
@@ -134,14 +135,19 @@ const moveToTransfer = async (contentText: string) => {
 }
 
 const generateSpeech = async (params: any) => {
+  // fileChunkGeneral, chunkIndex, headers
   const api = 'https://learningtools.onenote.com/learningtoolsapi/v2.0/GetSpeech'
-  if (params?.fileText) {
-    const dataRawFetch = await get(params?.fileText)
+  if (params?.fileChunkGeneral) {
+    const dataRawFetch = await get(params?.fileChunkGeneral)
     if (!dataRawFetch.ok) {
       console.log(dataRawFetch)
       throw new Error(dataRawFetch.data)
     }
-    params.contentText = dataRawFetch.data
+    params.contentText = dataRawFetch?.data?.split(CHUNK_SEPARATION)?.[params?.chunkIndex]
+  }
+  if (!params.contentText) {
+    handleError(JSON.stringify({ ...params, message: 'contentText empty' }), 'generateSpeech')
+    return null
   }
   const body = {
     "data": {
@@ -180,5 +186,6 @@ export {
   generateSpeech,
   readRequestBody,
   parseRequest,
-  handleError
+  handleError,
+  CHUNK_SEPARATION
 }

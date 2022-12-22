@@ -9,7 +9,8 @@ import {
   generateChunk,
   moveToTransfer,
   generateSpeech,
-  handleError
+  handleError,
+  CHUNK_SEPARATION
 } from './helpers'
 
 const controllerAuth = async (r: Request) => {
@@ -30,8 +31,11 @@ const controllerChunks = async (r: Request) => {
     const { pathname } = new URL(url)
     const [userName, repo, brand, fileName] = pathname.split('/').pop()?.split('-') || []
     const textURL = `https://raw.githubusercontent.com/${userName}/${repo}/${brand}/${fileName}`
-    const chunks = await generateChunk(textURL).then(chunks => Promise.all(chunks.map((c: string) => moveToTransfer(c))))
-    return { chunks }
+    // const chunks = await generateChunk(textURL).then(chunks => Promise.all(chunks.map((c: string) => moveToTransfer(c))))
+    const chunks = await generateChunk(textURL)
+    const chunkGeneral = chunks.join(CHUNK_SEPARATION)
+    const fileChunkGeneral = await moveToTransfer(chunkGeneral)
+    return fileChunkGeneral
   } catch (error: any) {
     handleError({ error, input: JSON.stringify(input) }, 'CONTROLLER-CHUNKS')
   }
@@ -43,10 +47,17 @@ const controllerAudio = async (r: Request) => {
     // transfer.sh-Ds32O7-hello.txt
     // "https://transfer.sh/Ds32O7/hello.txt"
     const { pathname } = new URL(input.url)
-    const [hostFile, ID1, ID2] = pathname.split('/').pop()?.split('-') || []
-    const fileText = `https://${hostFile}/${ID1}/${ID2}`
+    const [,, chunkIndexString, chunkMetaString] = pathname.split('/')
+    const chunkIndex = Number(chunkIndexString)
+    const [hostFile, ID1, ID2] = chunkMetaString?.split('-') || []
+    const fileChunkGeneral = `https://${hostFile}/${ID1}/${ID2}`
+    const validate = typeof chunkIndex !== 'number' || [hostFile, ID1, ID2].some(v => ['', undefined, null].includes(v))
+    if (validate) {
+      handleError(JSON.stringify({ url: input.url, message: 'chunkIndex null' }), 'controllerAudio')
+      return null
+    }
     const headers = await getSpeechAuth()
-    return await generateSpeech({ fileText, headers })
+    return await generateSpeech({ fileChunkGeneral, chunkIndex, headers })
   } catch (error: any) {
     handleError({ error, input: JSON.stringify(input) }, 'CONTROLLER-AUDIO')
   }
