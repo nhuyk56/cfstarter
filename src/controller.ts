@@ -44,7 +44,7 @@ const controllerChunks = async (r: Request) => {
 const controllerAudio = async (r: Request) => {
   const input = await parseRequest(r)
   try {
-    // transfer.sh-Ds32O7-hello.txt
+    // http://10.188.50.90:8787/audio/0/transfer.sh-jLXNiQ-hello.txt
     // "https://transfer.sh/Ds32O7/hello.txt"
     const { pathname } = new URL(input.url)
     const [,, chunkIndexString, chunkMetaString] = pathname.split('/')
