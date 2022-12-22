@@ -5,9 +5,9 @@ import {
 } from './controller'
 
 const routers = [
-  { route: '/auth', handle: controllerAuth },
-  { route: '/chunks', handle: controllerChunks },
-  { route: '/audio', handle: controllerAudio }
+  { route: '/auth', method: 'GET' , handle: controllerAuth },
+  { route: '/chunks', method: 'POST' , handle: controllerChunks },
+  { route: '/audio', method: 'POST' , handle: controllerAudio }
 ]
 
 export {

@@ -1,13 +1,23 @@
 import {
+  parseRequest,
   getSpeechAuth,
   generateChunk,
   moveToTransfer,
   generateSpeech
 } from './helpers'
 
-const controllerAuth = () => 'controllerAuth'
-const controllerChunks = () => 'controllerChunks'
-const controllerAudio = () => 'controllerAudio'
+const controllerAuth = async (r:Request) => {
+  const input = await parseRequest(r)
+  return input
+}
+const controllerChunks = async (r:Request) => {
+  const input = await parseRequest(r)
+  return input
+}
+const controllerAudio = async (r:Request) => {
+  const input = await parseRequest(r)
+  return input
+}
 
 export {
   controllerAuth,

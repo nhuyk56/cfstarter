@@ -19,17 +19,17 @@ export interface Env {
 	// MY_BUCKET: R2Bucket;
 }
 import { routers } from './routers'
-
 export default {
 	async fetch(
 		request: Request,
 		env: Env,
 		ctx: ExecutionContext
 	) {
-		const { pathname } = new URL(request.url);
-		const router = routers.find(r => new RegExp(`^${r.route}$`).test(pathname))
+		const { method, url } = request
+		const { pathname } = new URL(url)
+		const router = routers.find(r => new RegExp(`^${r.route}$`).test(pathname) && r.method === method)
 		if (router) {
-			const res = await router?.handle()
+			const res = await router?.handle(request)
 			if (res) {
 				if (typeof res !== 'string') {
 					return new Response(JSON.stringify(res))

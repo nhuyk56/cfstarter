@@ -1,3 +1,32 @@
+async function parseRequest(request:Request) {
+  const { method, url, headers, redirect, fetcher, signal, cf } = request
+  const body:any = await readRequestBody(request)
+  return { method, url, body, headers, redirect, fetcher, signal, cf }
+}
+async function readRequestBody(request:Request) {
+  const { headers } = request;
+  const contentType = headers.get('content-type') || '';
+
+  if (contentType.includes('application/json')) {
+    return JSON.stringify(await request.json());
+  } else if (contentType.includes('application/text')) {
+    return request.text();
+  } else if (contentType.includes('text/html')) {
+    return request.text();
+  } else if (contentType.includes('form')) {
+    const formData = await request.formData();
+    const body:any = {};
+    for (const entry of formData.entries()) {
+      body[entry[0]] = entry[1];
+    }
+    return JSON.stringify(body);
+  } else {
+    // Perhaps some other type of data was submitted in the form
+    // like an image, or some other binary data.
+    return null
+  }
+}
+
 async function generalFetch(url: string = '', option: any): Promise<any> {
   const myOption: RequestInit<RequestInitCfProperties> | undefined = {
     method: option.method,
@@ -128,5 +157,7 @@ export {
   getSpeechAuth,
   generateChunk,
   moveToTransfer,
-  generateSpeech
+  generateSpeech,
+  readRequestBody,
+  parseRequest
 }
