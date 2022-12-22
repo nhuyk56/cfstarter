@@ -49,12 +49,11 @@ async function generalFetch(url: string = '', option: any): Promise<any> {
   const response: Response = await fetch(url, myOption)
   const { ok, status, statusText } = response
   let data
-  const contentType = response.headers.get('Content-Type')
-  console.log(url, contentType)
-  // todo ? audio
+  const contentType = response.headers.get('Content-Type')?.replace('; charset=utf-8', '')
+  console.log(`[${option.method}|${ok}|${status}|${statusText}|${contentType}]`, url)
   if (contentType?.includes('json')) data = await response.json()
   else if (contentType?.includes('text')) data = await response.text()
-  else await response.text()
+  else data = await response.text()
   return { ok, status, statusText, data }
 }
 
@@ -153,7 +152,6 @@ const generateSpeech = async (params: any) => {
     }
   }
   const { data } = await post(api, { headers: params?.headers, body })
-  return data?.data?.sb.map((it: any) => it?.ad?.replace('data:audio/mpeg;base64,', '')).join('\n')
 }
 
 const handleError  = (error:any, name:any) => {
