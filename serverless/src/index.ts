@@ -32,8 +32,18 @@ export default {
 			const res = await router?.handle(request)
 			if (res) {
 				if (typeof res !== 'string') {
-					return new Response(JSON.stringify(res))
-				} else return new Response(res)
+					return new Response(JSON.stringify(res), {
+						headers: {
+							'Access-Control-Allow-Origin': '*',
+							'Access-Control-Allow-Credentials': 'true'
+						}
+					})
+				} else return new Response(res, {
+					headers: {
+						'Access-Control-Allow-Origin': '*',
+						'Access-Control-Allow-Credentials': 'true'
+					}
+				})
 			}
 		}
 		return new Response('404', { status: 404 })
